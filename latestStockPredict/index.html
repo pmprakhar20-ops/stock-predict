@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Trading Platform - Real-Time Market Analysis</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-ohlc"></script>
+  <script src="script.js"></script>
+</head>
+
+<body class="dark-theme">
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <div class="logo">
+        <div class="header-left">
+          <h1>Professional Trading Platform</h1>
+          <div class="datetime" id="datetime">2024-03-28 - 12:13:45</div>
+          <div class="market-status" id="marketStatus">🟢 Market Open</div>
+        </div>
+      </div>
+    </div>
+    <div class="top-bar-right">
+        <div class="search-container">
+          <input type="text" id="stockSearch" placeholder="Search stocks..." class="search-input">
+          <button class="search-btn" onclick="searchStock()">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+        <select id="timeInterval" class="time-interval">
+          <option value="1m">1m</option>
+          <option value="5m" selected>5m</option>
+          <option value="15m">15m</option>
+          <option value="1h">1h</option>
+          <option value="4h">4h</option>
+          <option value="1d">1d</option>
+        </select>
+        <button class="btn-indicators" onclick="toggleIndicators()">
+          <i class="fas fa-chart-line"></i> Indicators
+        </button>
+        <button class="btn-dashboard" onclick="showDashboard()">
+          <i class="fas fa-th"></i> Dashboard
+        </button>
+      </div>
+  </header>
+
+  <div class="trading-container">
+    <!-- Left Sidebar -->
+    <aside class="left-sidebar">
+      <!-- Stock Header -->
+      <div class="stock-header">
+        <div class="stock-title">
+          <h1 id="stockSymbol">RELIANCE</h1>
+          <div class="stock-name" id="stockName">Reliance Industries Ltd.</div>
+          <div class="stock-exchange">NSE • <span id="stockSector">Energy</span></div>
+        </div>
+        <div class="stock-price-info">
+          <div class="current-price" id="currentPrice">₹2,845.30</div>
+          <div class="price-change positive" id="priceChange">+45.60 (+1.63%)</div>
+        </div>
+      </div>
+
+      <!-- Key Statistics -->
+      <div class="key-stats">
+        <div class="stat-group">
+          <div class="stat-item">
+            <span class="stat-label">Open</span>
+            <span class="stat-value" id="openPrice">₹2,799.70</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Day Range</span>
+            <span class="stat-value" id="dayRange">₹2,795.30 - ₹2,858.90</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Volume</span>
+            <span class="stat-value" id="volume">12.5M</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Avg Volume</span>
+            <span class="stat-value" id="avgVolume">15.2M</span>
+          </div>
+        </div>
+        <div class="stat-group">
+          <div class="stat-item">
+            <span class="stat-label">High</span>
+            <span class="stat-value" id="highPrice">₹2,858.90</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">52W Range</span>
+            <span class="stat-value" id="week52Range">₹2,345.20 - ₹3,245.80</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Market Cap</span>
+            <span class="stat-value" id="marketCap">₹18.9T</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">P/E Ratio</span>
+            <span class="stat-value" id="peRatio">24.5</span>
+          </div>
+        </div>
+        <div class="stat-group">
+          <div class="stat-item">
+            <span class="stat-label">Low</span>
+            <span class="stat-value" id="lowPrice">₹2,795.30</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Prev Close</span>
+            <span class="stat-value" id="prevClose">₹2,799.70</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Exchange</span>
+            <span class="stat-value" id="exchange">NSE</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Beta</span>
+            <span class="stat-value" id="beta">1.15</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watchlist -->
+      <div class="watchlist">
+        <div class="section-header">
+          <h3>Watchlist</h3>
+          <button class="btn-add" onclick="showAddSymbolModal()">
+            <i class="fas fa-plus"></i> Add Symbol
+          </button>
+        </div>
+        <div class="watchlist-table">
+          <div class="watchlist-item" onclick="loadStock('RELIANCE')">
+            <span class="symbol">RELIANCE</span>
+            <span class="price">₹2,845.30</span>
+            <span class="change positive">+45.60</span>
+            <span class="change-percent positive">(+1.63%)</span>
+          </div>
+          <div class="watchlist-item" onclick="loadStock('TCS')">
+            <span class="symbol">TCS</span>
+            <span class="price">₹3,412.50</span>
+            <span class="change positive">+28.90</span>
+            <span class="change-percent positive">(+0.85%)</span>
+          </div>
+          <div class="watchlist-item" onclick="loadStock('HDFCBANK')">
+            <span class="symbol">HDFCBANK</span>
+            <span class="price">₹1,658.20</span>
+            <span class="change negative">-12.40</span>
+            <span class="change-percent negative">(-0.74%)</span>
+          </div>
+          <div class="watchlist-item" onclick="loadStock('INFY')">
+            <span class="symbol">INFY</span>
+            <span class="price">₹1,425.80</span>
+            <span class="change positive">+18.60</span>
+            <span class="change-percent positive">(+1.32%)</span>
+          </div>
+          <div class="watchlist-item" onclick="loadStock('ICICIBANK')">
+            <span class="symbol">ICICIBANK</span>
+            <span class="price">₹912.45</span>
+            <span class="change positive">+8.75</span>
+            <span class="change-percent positive">(+0.97%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screener -->
+      <div class="screener">
+        <div class="tab-header">
+          <button class="tab-btn active" onclick="switchTab('screener')">Screener</button>
+          <button class="tab-btn" onclick="switchTab('momentum')">Momentum</button>
+        </div>
+        <div class="screener-content">
+          <div class="screener-item" onclick="loadStock('HINDUNILVR')">
+            <span class="symbol">HINDUNILVR</span>
+            <span class="price">₹2,568.90</span>
+            <span class="change positive">+15.40</span>
+            <span class="change-percent positive">+0.60%</span>
+          </div>
+          <div class="screener-item" onclick="loadStock('SBIN')">
+            <span class="symbol">SBIN</span>
+            <span class="price">₹585.60</span>
+            <span class="change negative">-8.20</span>
+            <span class="change-percent negative">-1.38%</span>
+          </div>
+          <div class="screener-item" onclick="loadStock('BHARTIARTL')">
+            <span class="symbol">BHARTIARTL</span>
+            <span class="price">₹845.30</span>
+            <span class="change positive">+12.50</span>
+            <span class="change-percent positive">+1.50%</span>
+          </div>
+          <div class="screener-item" onclick="loadStock('KOTAKBANK')">
+            <span class="symbol">KOTAKBANK</span>
+            <span class="price">₹1,825.40</span>
+            <span class="change positive">+22.80</span>
+            <span class="change-percent positive">+1.26%</span>
+          </div>
+          <div class="screener-item" onclick="loadStock('LT')">
+            <span class="symbol">LT</span>
+            <span class="price">₹3,245.80</span>
+            <span class="change negative">-18.60</span>
+            <span class="change-percent negative">-0.57%</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Trading Area -->
+    <main class="main-trading">
+      <!-- Chart Details -->
+      <div class="chart-details">
+        <div class="chart-info">
+          <div class="chart-controls">
+            <div class="chart-type-selector">
+              <button class="chart-type-btn active" onclick="setChartType('candlestick')" data-type="candlestick">
+                <i class="fas fa-chart-candlestick"></i> Candlestick
+              </button>
+              <button class="chart-type-btn" onclick="setChartType('line')" data-type="line">
+                <i class="fas fa-chart-line"></i> Line
+              </button>
+              <button class="chart-type-btn" onclick="setChartType('bar')" data-type="bar">
+                <i class="fas fa-chart-bar"></i> Bar
+              </button>
+              <button class="chart-type-btn" onclick="setChartType('area')" data-type="area">
+                <i class="fas fa-chart-area"></i> Area
+              </button>
+              <button class="chart-type-btn" onclick="setChartType('ohlc')" data-type="ohlc">
+                <i class="fas fa-chart-ohlc"></i> OHLC
+              </button>
+              <button class="chart-type-btn" onclick="setChartType('hollowcandlestick')" data-type="hollowcandlestick">
+                <i class="fas fa-chart-hollow"></i> Hollow
+              </button>
+            </div>
+          </div>
+          <span id="chartDetails">O₹369.210 H₹369.210 L₹369.070 C₹369.080 -₹0.130 (-0.04%)</span>
+          <span id="volumeSMA">Volume SMA 9: 16.852K</span>
+        </div>
+      </div>
+
+      <!-- AI Prediction Panel -->
+      <div class="ai-section">
+        <div class="ai-header">
+          <h4>AI Pattern Analysis</h4>
+          <div class="ai-status" id="aiStatus">Ready to analyze</div>
+        </div>
+        <div class="ai-content">
+          <div class="ai-metrics">
+            <div class="metric-item">
+              <span class="metric-label">Pattern Strength</span>
+              <span class="metric-value" id="patternStrength">--</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Confidence</span>
+              <span class="metric-value" id="confidence">--</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Target Return</span>
+              <span class="metric-value" id="targetReturn">--</span>
+            </div>
+
+          </div>
+          <div class="ai-analysis">
+            <div class="analysis-item">
+              <span class="analysis-label">Best Case</span>
+              <span class="analysis-value positive" id="bestCase">--</span>
+            </div>
+            <div class="analysis-item">
+              <span class="analysis-label">Worst Case</span>
+              <span class="analysis-value negative" id="worstCase">--</span>
+            </div>
+            <div class="analysis-item">
+              <span class="analysis-label">Recommendation</span>
+              <span class="analysis-value" id="recommendation">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Candlestick Chart -->
+      <div class="chart-container">
+        <canvas id="candlestickChart"></canvas>
+      </div>
+
+      <!-- Bottom Panels -->
+      <div class="bottom-panels">
+        <!-- Level II -->
+        <div class="panel level2">
+          <div class="panel-header">
+            <h4>Level II</h4>
+          </div>
+          <div class="level2-table">
+            <div class="level2-header">
+              <span>Shares Ex</span>
+              <span>Bid</span>
+              <span>Ask</span>
+              <span>Ex</span>
+              <span>Shares</span>
+            </div>
+            <div class="level2-row">
+              <span>BATS</span>
+              <span>₹369.07</span>
+              <span>₹369.08</span>
+              <span>ARCA</span>
+              <span>100</span>
+            </div>
+            <div class="level2-row">
+              <span>EDGX</span>
+              <span>₹369.06</span>
+              <span>₹369.09</span>
+              <span>MIAX</span>
+              <span>200</span>
+            </div>
+            <div class="level2-row">
+              <span>ARCA</span>
+              <span>₹369.05</span>
+              <span>₹369.10</span>
+              <span>NASD</span>
+              <span>150</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="panel orders">
+          <div class="panel-header">
+            <div class="tab-nav">
+              <button class="tab-btn active" onclick="switchOrderTab('all')">All</button>
+              <button class="tab-btn" onclick="switchOrderTab('open')">Open</button>
+              <button class="tab-btn" onclick="switchOrderTab('filled')">Filled</button>
+            </div>
+          </div>
+          <div class="orders-table">
+            <div class="orders-header">
+              <span>Action</span>
+              <span>Symbol</span>
+              <span>Price</span>
+              <span>Qty</span>
+            </div>
+            <div class="orders-row">
+              <span class="action buy">BUY</span>
+              <span>AAPL</span>
+              <span>₹182.50</span>
+              <span>100</span>
+            </div>
+            <div class="orders-row">
+              <span class="action sell">SELL</span>
+              <span>MSFT</span>
+              <span>₹378.90</span>
+              <span>50</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Place Order -->
+        <div class="panel place-order">
+          <div class="panel-header">
+            <h4>Place Order</h4>
+          </div>
+          <div class="order-tabs">
+            <button class="order-tab active" onclick="setOrderType('limit')">Limit</button>
+            <button class="order-tab" onclick="setOrderType('market')">Market</button>
+            <button class="order-tab" onclick="setOrderType('stop')">Stop Loss</button>
+            <button class="order-tab" onclick="setOrderType('stop-limit')">Stop Limit</button>
+          </div>
+          <div class="order-form">
+            <div class="buy-sell-buttons">
+              <button class="btn-buy" onclick="placeOrder('buy')">
+                <i class="fas fa-arrow-up"></i> BUY
+              </button>
+              <button class="btn-sell" onclick="placeOrder('sell')">
+                <i class="fas fa-arrow-down"></i> SELL
+              </button>
+            </div>
+            <div class="order-inputs">
+              <div class="input-group">
+                <label>Quantity</label>
+                <input type="number" id="orderQuantity" value="100" min="1">
+              </div>
+              <div class="input-group">
+                <label>Price (₹)</label>
+                <input type="number" id="orderPrice" value="369.08" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Position -->
+        <div class="panel position">
+          <div class="panel-header">
+            <h4>Position</h4>
+          </div>
+          <div class="position-table">
+            <div class="position-header">
+              <span>Symbol</span>
+              <span>T</span>
+              <span>L</span>
+              <span>Qty.</span>
+              <span>Un. Pnl</span>
+            </div>
+            <div class="position-row">
+              <span>AAPL</span>
+              <span>₹180.25</span>
+              <span>₹182.52</span>
+              <span>100</span>
+              <span class="positive">+₹227.00</span>
+            </div>
+            <div class="position-row">
+              <span>MSFT</span>
+              <span>₹375.80</span>
+              <span>₹378.91</span>
+              <span>50</span>
+              <span class="negative">-₹155.50</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Symbol Modal -->
+  <div id="addSymbolModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Symbol to Watchlist</h3>
+        <span class="close" onclick="closeAddSymbolModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label>Symbol</label>
+          <input type="text" id="newSymbol" placeholder="Enter stock symbol">
+        </div>
+        <button class="btn-primary" onclick="addSymbol()">Add Symbol</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+<!-- Dashboard Modal -->
+  <div id="dashboardModal" class="modal">
+    <div class="modal-content dashboard-modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-th"></i> Stock Dashboard</h3>
+        <span class="close" onclick="closeDashboardModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="dashboard-search">
+          <input type="text" id="dashboardSearch" placeholder="Search stocks in dashboard..." class="search-input">
+        </div>
+        
+        <!-- Indices Section -->
+        <div class="indices-section">
+          <div class="indices-header">
+            <h4><i class="fas fa-chart-line"></i> Market Indices</h4>
+          </div>
+          <div class="indices-grid">
+            <!-- Indian Indices -->
+            <div class="indices-group">
+              <div class="group-title">Indian Indices</div>
+              <div class="indices-list">
+                <div class="index-item" onclick="loadIndex('NIFTY 50')">
+                  <span class="index-name">NIFTY 50</span>
+                  <span class="index-value" id="nifty50">--</span>
+                  <span class="index-change" id="nifty50Change">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('NIFTY BANK')">
+                  <span class="index-name">NIFTY BANK</span>
+                  <span class="index-value" id="niftyBank">--</span>
+                  <span class="index-change" id="niftyBankChange">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('SENSEX')">
+                  <span class="index-name">SENSEX</span>
+                  <span class="index-value" id="sensex">--</span>
+                  <span class="index-change" id="sensexChange">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('NIFTY IT')">
+                  <span class="index-name">NIFTY IT</span>
+                  <span class="index-value" id="niftyIT">--</span>
+                  <span class="index-change" id="niftyITChange">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('NIFTY PHARMA')">
+                  <span class="index-name">NIFTY PHARMA</span>
+                  <span class="index-value" id="niftyPharma">--</span>
+                  <span class="index-change" id="niftyPharmaChange">--</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Global Indices -->
+            <div class="indices-group">
+              <div class="group-title">Global Indices</div>
+              <div class="indices-list">
+                <div class="index-item" onclick="loadIndex('DOW JONES')">
+                  <span class="index-name">DOW JONES</span>
+                  <span class="index-value" id="dowJones">--</span>
+                  <span class="index-change" id="dowJonesChange">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('S&P 500')">
+                  <span class="index-name">S&P 500</span>
+                  <span class="index-value" id="sp500">--</span>
+                  <span class="index-change" id="sp500Change">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('NASDAQ')">
+                  <span class="index-name">NASDAQ</span>
+                  <span class="index-value" id="nasdaq">--</span>
+                  <span class="index-change" id="nasdaqChange">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('FTSE')">
+                  <span class="index-name">FTSE</span>
+                  <span class="index-value" id="ftse">--</span>
+                  <span class="index-change" id="ftseChange">--</span>
+                </div>
+                <div class="index-item" onclick="loadIndex('NIKKEI')">
+                  <span class="index-name">NIKKEI</span>
+                  <span class="index-value" id="nikkei">--</span>
+                  <span class="index-change" id="nikkeiChange">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Top Gainers & Losers Section -->
+        <div class="gainers-losers-section">
+          <div class="gainers-losers-header">
+            <h4><i class="fas fa-chart-line"></i> Market Movers</h4>
+          </div>
+          <div class="gainers-losers-grid">
+            <!-- Top Gainers -->
+            <div class="movers-group">
+              <div class="group-title gainers">
+                <i class="fas fa-arrow-up"></i> Top Gainers
+              </div>
+              <div class="movers-list" id="topGainers">
+                <!-- Gainers will be dynamically generated here -->
+              </div>
+            </div>
+            
+            <!-- Top Losers -->
+            <div class="movers-group">
+              <div class="group-title losers">
+                <i class="fas fa-arrow-down"></i> Top Losers
+              </div>
+              <div class="movers-list" id="topLosers">
+                <!-- Losers will be dynamically generated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stock-grid" id="stockGrid">
+          <!-- Stock boxes will be dynamically generated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
