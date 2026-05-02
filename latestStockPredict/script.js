@@ -212,45 +212,50 @@ async function searchStock() {
         showNotification('Please enter a stock symbol', 'error');
         return;
     }
+
+    // Basic symbol validation — only letters, numbers, hyphen, dot allowed
+    if (!/^[A-Z0-9&.-]{1,20}$/.test(symbol)) {
+        showNotListedPopup(symbol);
+        searchInput.disabled = false;
+        searchInput.value = '';
+        return;
+    }
     
     try {
         searchInput.disabled = true;
         showNotification(`Searching ${symbol}...`, 'info');
 
-        // Validate: try to fetch real stock data from backend
-        const response = await fetch(`${window.location.origin}/api/stock/${symbol}`);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
+        const response = await fetch(`${window.location.origin}/api/stock/${symbol}`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeout);
         
         if (response.ok) {
             const stockInfo = await response.json();
             
             if (stockInfo.error) {
-                // Backend returned error — not listed
                 showNotListedPopup(symbol);
                 return;
             }
 
-            // CRITICAL FIX: Save stock data
             stockData[symbol] = stockInfo;
-            
             updateStockInfo(stockInfo);
-            
-            // Update chart with real data immediately
             updateChartWithRealData(stockInfo);
-            
             currentStock = symbol;
-        
-            // Run real AI analysis
             await runAIAnalysis(symbol);
-            
-            console.log(`✅ Searched ${symbol} - Price: ₹${stockInfo.currentPrice}`);
             showNotification(`Loaded ${symbol} with real market data`, 'success');
         } else {
-            // 404 or other error — stock not found/not listed
             showNotListedPopup(symbol);
         }
     } catch (error) {
-        console.error('Error searching stock:', error);
-        showNotListedPopup(symbol);
+        if (error.name === 'AbortError') {
+            showNotification(`Timeout — server slow, try again`, 'error');
+        } else {
+            showNotListedPopup(symbol);
+        }
     } finally {
         searchInput.disabled = false;
         searchInput.value = '';
