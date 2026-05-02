@@ -101,31 +101,19 @@ def get_stock_data(symbol):
         else:
             ticker_symbol = symbol
 
-        # Fetch stock data from yfinance with retry
-        hist = None
-        stock = None
-        for attempt in range(3):
-            try:
-                stock = yf.Ticker(ticker_symbol)
-                hist = stock.history(period="1mo")
-                if not hist.empty:
-                    break
-            except Exception as e:
-                print(f"Attempt {attempt+1} failed: {e}")
-                time.sleep(1)
+        # Fetch stock data
+        stock = yf.Ticker(ticker_symbol)
+        hist = stock.history(period="1mo")
 
         # Try BSE if NSE fails
-        if hist is None or hist.empty:
-            try:
-                ticker_symbol_bo = symbol.replace('.NS', '').replace('.BO', '') + '.BO'
-                stock = yf.Ticker(ticker_symbol_bo)
-                hist = stock.history(period="1mo")
-                if not hist.empty:
-                    ticker_symbol = ticker_symbol_bo
-            except:
-                pass
+        if hist.empty:
+            ticker_symbol_bo = symbol.replace('.NS', '').replace('.BO', '') + '.BO'
+            stock = yf.Ticker(ticker_symbol_bo)
+            hist = stock.history(period="1mo")
+            if not hist.empty:
+                ticker_symbol = ticker_symbol_bo
 
-        if hist is None or hist.empty:
+        if hist.empty:
             return jsonify({'error': 'Stock not found'}), 404
         
         # Get current price and other data
