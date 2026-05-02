@@ -75,16 +75,12 @@ const popularStocks = [
   'APOLLOHOSP', 'EICHERMOT', 'MCDOWELL-N', 'UPL', 'ADANIPORTS', 'JSWSTEEL'
 ];
 
-// Check if stock is NSE listed — tries yfinance first, then whitelist
+// Check if stock is NSE listed — only backend (yfinance) validates
 async function isNSEListed(symbol) {
-  // First check local whitelist
-  if (NSE_LISTED_STOCKS.has(symbol)) return true;
-  // Also allow if backend confirms data exists (yfinance validation)
   try {
     const res = await fetch(`${window.location.origin}/api/stock/${symbol}`);
     if (res.ok) {
       const data = await res.json();
-      // Valid if we got real price data (not an error)
       return data && data.currentPrice && !data.error;
     }
   } catch(e) {}
